@@ -1,6 +1,7 @@
 const  express=require('express')
 const cors=require('cors')
 const cookieParser=require('cookie-parser')
+const connectDB=require('./db')
 
 require('dotenv').config()
 
@@ -15,10 +16,13 @@ app.use(express.json())
 
 //middleware
 app.use(cors())
-app.use(cookieParser())
+app.use(cookieParser(process.env.ACCESS_KEY))
+
+//route
+app.use(`/api/v1/auth`, require('./route/authRoute'))
 
 //default route
-app.use(`**`,(req,res)=>{
+app.all(`**`,(req,res)=>{
     return res.status(404).json({msg:`Requested path Not Found..`})
 })
 
@@ -26,6 +30,7 @@ app.use(`**`,(req,res)=>{
 
 function launchServer(){
     app.listen(PORT,async()=>{
+        await connectDB()
     console.log(`server is started @ http://localhost:${PORT}`)
     })
 }
